@@ -10,11 +10,13 @@ date_format_str = '%Y-%m-%d'
 
 date_now = datetime.now()
 date_now = f"{date_now.strftime('%Y')}-{date_now.strftime('%m')}-{date_now.strftime('%d')}"
-fileObject=open("access_details.json", "r")
-jsonContent=fileObject.read()
-data=json.loads(jsonContent)
+file_object=open("access_details.json", "r")
+json_content=file_object.read()
+data=json.loads(json_content)
 
 statements=[]
+removed_statements=[]
+
 for i in data:
     service=i['ServiceNamespace']
     last_date=i['LastAuthenticated'].split("T")[0]
@@ -23,29 +25,42 @@ for i in data:
     end = datetime.strptime(str(last_date), date_format_str)
     days = start - end
     
-    actionList=[]
+    action_list=[]
     if "TrackedActionsLastAccessed" in i:
         actions=i['TrackedActionsLastAccessed']
-        actionList=[]
+        action_list=[]
         for i in actions:
             action=f"{service}:{i['ActionName']}"
-            actionList.append(action)
+            action_list.append(action)
     else:
-        actionList.append(f"{service}:*")
+        action_list.append(f"{service}:*")
 
     statement={
         "Effect":"Allow",
-        "Action":actionList,
+        "Action":action_list,
         "Resource":["*"]
     }
     if input_days > int(days.days):
         statements.append(statement)
+    else:
+        removed_statements.append(statement)
+        
 policy={
     "Version":"2012-10-17",
     "Statement":statements
 }
 
-policyJson=json.dumps(policy, indent=4)
+policy_json=json.dumps(policy, indent=4)
 with open("policy_document.json", "w") as outfile:
-    outfile.write(policyJson)
+    outfile.write(policy_json)
 print("Policy Created: policy_document.json")
+
+if removed_statements:
+    removed_policy={
+        "Version":"2012-10-17",
+        "Statement":removed_statements
+    }
+    removed_policy_json=json.dumps(removed_policy, indent=4)
+    with open("removed_policies_document.json", "w") as outfile:
+        outfile.write(removed_policy_json)
+    print("Policy Created: removed_policies_document.json")
