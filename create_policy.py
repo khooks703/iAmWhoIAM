@@ -19,32 +19,34 @@ removed_statements=[]
 
 for i in data:
     service=i['ServiceNamespace']
-    last_date=i['LastAuthenticated'].split("T")[0]
-
-    start = datetime.strptime(str(date_now), date_format_str)
-    end = datetime.strptime(str(last_date), date_format_str)
-    days = start - end
+    try:
+        last_date=i['LastAuthenticated'].split("T")[0]
     
-    action_list=[]
-    if "TrackedActionsLastAccessed" in i:
-        actions=i['TrackedActionsLastAccessed']
-        action_list=[]
-        for i in actions:
-            action=f"{service}:{i['ActionName']}"
-            action_list.append(action)
-    else:
-        action_list.append(f"{service}:*")
-
-    statement={
-        "Effect":"Allow",
-        "Action":action_list,
-        "Resource":["*"]
-    }
-    if input_days > int(days.days):
-        statements.append(statement)
-    else:
-        removed_statements.append(statement)
+        start = datetime.strptime(str(date_now), date_format_str)
+        end = datetime.strptime(str(last_date), date_format_str)
+        days = start - end
         
+        action_list=[]
+        if "TrackedActionsLastAccessed" in i:
+            actions=i['TrackedActionsLastAccessed']
+            action_list=[]
+            for i in actions:
+                action=f"{service}:{i['ActionName']}"
+                action_list.append(action)
+        else:
+            action_list.append(f"{service}:*")
+    
+        statement={
+            "Effect":"Allow",
+            "Action":action_list,
+            "Resource":["*"]
+        }
+        if input_days > int(days.days):
+            statements.append(statement)
+        else:
+            removed_statements.append(statement)
+    except:
+        pass
 policy={
     "Version":"2012-10-17",
     "Statement":statements
