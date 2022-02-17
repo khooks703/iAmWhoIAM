@@ -51,9 +51,9 @@ policy={
 }
 
 policy_json=json.dumps(policy, indent=4)
-with open("policy_document.json", "w") as outfile:
+with open("out/policy_document.json", "w") as outfile:
     outfile.write(policy_json)
-print("Policy Created: policy_document.json")
+print("Policy Created: out/policy_document.json")
 
 if removed_statements:
     removed_policy={
@@ -61,6 +61,6 @@ if removed_statements:
         "Statement":removed_statements
     }
     removed_policy_json=json.dumps(removed_policy, indent=4)
-    with open("removed_policies_document.json", "w") as outfile:
+    with open("out/removed_policies_document.json", "w") as outfile:
         outfile.write(removed_policy_json)
-    print("Policy Created: removed_policies_document.json")
+    print("Policy Created: out/removed_policies_document.json")
