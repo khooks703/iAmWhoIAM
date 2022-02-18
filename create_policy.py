@@ -9,7 +9,9 @@ except IndexError:
 date_format_str = '%Y-%m-%d'
 
 date_now = datetime.now()
+# Make sure you're using python 3
 date_now = f"{date_now.strftime('%Y')}-{date_now.strftime('%m')}-{date_now.strftime('%d')}"
+
 file_object=open("access_details.json", "r")
 json_content=file_object.read()
 data=json.loads(json_content)
